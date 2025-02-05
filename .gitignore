@@ -6,4 +6,8 @@
 *.mp3
 *.ogg
 
+.env
+
 .cert/
+secrets/age-key.txt
+secrets/public-age-key.txt
