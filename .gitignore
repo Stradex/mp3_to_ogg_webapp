@@ -2,3 +2,8 @@
 
 *.vim
 *.sw*
+
+*.mp3
+*.ogg
+
+.cert/
