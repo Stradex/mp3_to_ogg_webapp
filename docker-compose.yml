@@ -1,0 +1,31 @@
+---
+version: '3.8'
+
+networks:
+  internal_network:
+    driver: bridge
+
+services:
+  fastapi: 
+    image: python:3
+    container_name: fastapi
+    hostname: fastapi
+    working_dir: /app 
+    volumes:
+      - ./apps/converter:/app
+    networks:
+      - internal_network
+    ports:
+      - "8000:8000"
+    command: /bin/bash -c 'python -m venv /etc/venv/ && source /etc/venv/bin/activate && pip install "fastapi[standard]" && pip install "uvicorn[standard]" && pip install asyncio && uvicorn main:app --host 0.0.0.0 --port 8000 --reload'
+  converter: 
+    image: python:3
+    container_name: converter
+    hostname: converter
+    working_dir: /app 
+    volumes:
+      - ./apps/converter:/app
+    networks:
+      - internal_network
+    #command: /bin/bash -c 'apt-get update && apt-get install -y nodejs npm && npm install -g nodemon && python -m venv /etc/venv/ && source /etc/venv/bin/activate && pip install python-ffmpeg && pip install asyncio && nodemon worker.py'
+    command: /bin/bash -c 'python -m venv /etc/venv/ && source /etc/venv/bin/activate && pip install python-ffmpeg && pip install asyncio && python3 -u worker.py'
