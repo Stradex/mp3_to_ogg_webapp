@@ -53,7 +53,7 @@ services:
       - ./.env:/app/.env
     networks:
       - internal_network
-    command: /bin/bash -c 'python -m venv /etc/venv/ && source /etc/venv/bin/activate && pip install "fastapi[standard]" && pip install "uvicorn[standard]" && pip install asyncio && uvicorn main:app --host 0.0.0.0 --port 8000 --reload'
+    command: /bin/bash -c 'python -m venv /etc/venv/ && source /etc/venv/bin/activate && pip install python-dotenv && pip install "fastapi[standard]" && pip install "uvicorn[standard]" && pip install asyncio && uvicorn main:app --host 0.0.0.0 --port 8000 --reload'
 
   converter: 
     image: nikolaik/python-nodejs:python3.9-nodejs23
@@ -65,4 +65,4 @@ services:
       - ./.env:/app/.env
     networks:
       - internal_network
-    command: /bin/bash -c 'apt-get update && apt-get install -y ffmpeg && npm install -g nodemon && python -m venv /etc/venv/ && source /etc/venv/bin/activate && pip install python-ffmpeg && pip install asyncio && nodemon --exec python3 -u worker.py'
+    command: /bin/bash -c 'apt-get update && apt-get install -y ffmpeg && npm install -g nodemon && python -m venv /etc/venv/ && source /etc/venv/bin/activate && pip install python-dotenv && pip install python-ffmpeg && pip install asyncio && nodemon --exec python3 -u worker.py'

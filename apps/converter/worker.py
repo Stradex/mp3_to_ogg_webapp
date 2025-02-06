@@ -5,6 +5,8 @@ import os
 import time
 import string
 import random
+from dotenv import load_dotenv
+load_dotenv() 
 
 dirname = os.path.dirname(__file__)
 upload_folder = os.path.join(dirname, 'uploaded/')
@@ -16,6 +18,7 @@ def file_already_converted(file_path):
     file_basename = file_data[0]
 
     return os.path.isfile(converted_folder + file_basename + '.ogg')
+
 def convert_to_ogg(file_path):
     file_name = os.path.basename(file_path)
     file_data = os.path.splitext(file_name)
@@ -29,19 +32,27 @@ def convert_to_ogg(file_path):
     ffmpeg.execute()
 
 def uploadFileToBucket(file_path):
-    print("Uploading to bucket...")
+    print("[DEBUG] Uploading to bucket...")
 
-def processFiles():
-    print("[DEBUG] Processing files...")
-
+def processLocalFiles():
+    print("[DEBUG] Processing local files")
     filesUploaded = [f for f in os.listdir(upload_folder) if os.path.isfile(upload_folder + f)]
     for file in filesUploaded:
         if file_already_converted(file):
             continue
         print(file)
         convert_to_ogg(upload_folder + file)
-        uploadFileToBucket(converted_folder + file)
+        print("File will be stored locally")
 
+def processRemoteFiles():
+    print("[DEBUG] S3 not configured yet... not able to process any remote file.")
+
+def processFiles():
+    if os.getenv('STORAGE_LOCAL') == 'true':
+        processLocalFiles()
+    else:
+        processRemoteFiles()
+ 
 def main():
     while(True):
         processFiles()

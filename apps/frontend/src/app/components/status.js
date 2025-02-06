@@ -19,7 +19,7 @@ export default function FileStatus() {
 			try {
 				const apiRes = await fetch(`/backend/status/${id}`, { method: 'GET'});
 				const dataRes = await apiRes.json();
-				setStatus(dataRes.status);
+				setStatus(JSON.stringify(dataRes));
 				setDownloadReady(dataRes.status === 'CONVERTED');
 
 				setFileID(id);
