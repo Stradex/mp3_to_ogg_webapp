@@ -41,19 +41,22 @@ export class AppController {
 		const fileID: string = generateUniqueFileID(file);
 		console.log("[DEBUG] File uploaded", file)
 		const remoteFileName: string = generateUniqueFileName(file, fileID);
-		const formData = new FormData();
-		formData.append('file', new Blob([file.buffer]), file.originalname);
-		const orderRes = await fetch(`${this.appService.env.storage.host}upload/${fileID}`, { method: 'POST', body: formData });
-		const dataRes = await orderRes.json();
-		console.log("[DEBUG] FAPI response: ", dataRes);
-
-		// HERE upload file to bucket..
-    res.status(HttpStatus.OK).json({status: 'OK', fileUploaded: remoteFileName, fileID: fileID});
+		console.log("[DEBUG] Storate local: ", this.appService.env.storage.isLocal);
+		if (this.appService.env.storage.isLocal) {
+			const formData = new FormData();
+			formData.append('file', new Blob([file.buffer]), file.originalname);
+			const orderRes = await fetch(`${this.appService.env.storage.host}upload/${fileID}`, { method: 'POST', body: formData });
+			const dataRes = await orderRes.json();
+			console.log("[DEBUG] FAPI response: ", dataRes);
+			res.status(HttpStatus.OK).json({status: 'OK', fileUploaded: remoteFileName, fileID: fileID});
+		} else {
+			res.status(HttpStatus.OK).json({status: 'ERROR', description: 'External S3 bucket still not configured'});
+		}
   }
 
   @Get('status/:file_id')
   async getFileStatus(@Param('file_id') fileID: string, @Res() res: Response) {
-		const orderRes = await fetch(`http://fastapi:8000/status/${fileID}`, { method: 'GET' });
+		const orderRes = await fetch(`${this.appService.env.file_manager.host}status/${fileID}`, { method: 'GET' });
 		const dataRes = await orderRes.json();
 		// HERE: Connect with FASTAPI to check file status.
     res.status(HttpStatus.OK).json(dataRes);
@@ -61,16 +64,17 @@ export class AppController {
 
   @Get('download/:file_id')
   async downloadConvertedFile(@Param('file_id') fileID: string, @Res() res: Response) {
-		// HERE: Connect with FASTAPI to download converted file
-		const file_res = await fetch(`http://fastapi:8000/download/${fileID}`, { method: 'GET' });
-
-		const file_blob = await file_res.blob()
-		console.log(file_blob);
-		const arrayBuffer = await file_blob.arrayBuffer();
-		const file_buffer = Buffer.from(arrayBuffer);
-	  res.setHeader("Content-Type", "audio/mpeg; charset=binary"); // set content type and charset
-    res.charset = "binary";
-    res.status(HttpStatus.OK).send(file_buffer);
+		if (this.appService.env.storage.isLocal) {
+			const file_res = await fetch(`${this.appService.env.storage.host}download/${fileID}`, { method: 'GET' });
+			const file_blob = await file_res.blob()
+			console.log(file_blob);
+			const arrayBuffer = await file_blob.arrayBuffer();
+			const file_buffer = Buffer.from(arrayBuffer);
+			res.setHeader("Content-Type", "audio/mpeg; charset=binary"); // set content type and charset
+			res.charset = "binary";
+			res.status(HttpStatus.OK).send(file_buffer);
+		} else {
+			res.status(HttpStatus.OK).json({status: 'ERROR', description: 'External S3 bucket still not configured'});
+		}
   }
-
 }
