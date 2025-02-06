@@ -33,6 +33,7 @@ def uploadFileToBucket(file_path):
 
 def processFiles():
     print("[DEBUG] Processing files...")
+
     filesUploaded = [f for f in os.listdir(upload_folder) if os.path.isfile(upload_folder + f)]
     for file in filesUploaded:
         if file_already_converted(file):
