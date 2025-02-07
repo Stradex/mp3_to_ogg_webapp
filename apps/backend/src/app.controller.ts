@@ -47,10 +47,17 @@ export class AppController {
 			formData.append('file', new Blob([file.buffer]), file.originalname);
 			const orderRes = await fetch(`${this.appService.env.storage.host}upload/${fileID}`, { method: 'POST', body: formData });
 			const dataRes = await orderRes.json();
+
 			console.log("[DEBUG] FAPI response: ", dataRes);
 			res.status(HttpStatus.OK).json({status: 'OK', fileUploaded: remoteFileName, fileID: fileID});
 		} else {
-			res.status(HttpStatus.OK).json({status: 'ERROR', description: 'External S3 bucket still not configured'});
+			const s3Res = await this.appService.uploadFile(file, remoteFileName);
+			console.log("S3 RESPONSE: ", s3Res);
+			if (s3Res?.Location !== 'undefined' && s3Res?.Key !== 'undefined' && s3Res?.ETag !== 'undefined') {
+				res.status(HttpStatus.OK).json({status: 'OK', fileUploaded: s3Res.Key, fileID: fileID});
+			} else {
+				res.status(HttpStatus.OK).json({status: 'ERROR', description: 'failed to upload file to storage server.'});
+			}	
 		}
   }
 
@@ -74,7 +81,13 @@ export class AppController {
 			res.charset = "binary";
 			res.status(HttpStatus.OK).send(file_buffer);
 		} else {
-			res.status(HttpStatus.OK).json({status: 'ERROR', description: 'External S3 bucket still not configured'});
+			const s3FileURL: string | null = await this.appService.getConvertedFileURL(fileID);
+			console.log("S3 FILE URL: ", s3FileURL);
+			if (!s3FileURL) {
+				res.status(HttpStatus.OK).json({status: 'ERROR', description: 'Remote file does not exists.'});
+			} else {
+				res.status(HttpStatus.OK).json({status: 'OK', url: s3FileURL});
+			}
 		}
   }
 }

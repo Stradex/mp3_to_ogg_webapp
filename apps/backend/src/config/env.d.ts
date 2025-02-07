@@ -6,3 +6,11 @@ export interface EnvStorageType {
 export interface EnvFileManagerType {
   host: string;
 };
+
+export interface EnvDigitalSpacesType {
+  key_name: string;
+  access_id: string;
+  access_key: string;
+  endpoint: string;
+	bucket_name: string;
+};

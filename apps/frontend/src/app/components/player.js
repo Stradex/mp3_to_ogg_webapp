@@ -16,10 +16,19 @@ export default function SoundPlayer() {
     const downloadAudio = async (id) => {
 			try {
 				const apiRes = await fetch(`/backend/download/${id}`, { method: 'GET'});
-				const audioBlob = await apiRes.blob();
-				const newBlob = new Blob([audioBlob], { type: "audio/ogg",  codecs: "opus" })
+				let audioURL = "";
+
+				if (1) {
+					const audioData = await apiRes.json();
+					console.log(audioData);
+					audioURL = audioData.url;
+				} else {
+					const audioBlob = await apiRes.blob();
+					const newBlob = new Blob([audioBlob], { type: "audio/ogg",  codecs: "opus" })
+					audioURL = URL.createObjectURL(newBlob);
+				}
 				setTrack({
-					url: URL.createObjectURL(newBlob),
+					url: audioURL,
 					title: "Converted file",
 					tags: ["converted"],
 				});
