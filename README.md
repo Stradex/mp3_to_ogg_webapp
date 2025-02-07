@@ -1,6 +1,6 @@
-# Video converter web app.
+# MP3 to OGG converter web app.
 
-This is a basic video converter web app.
+This is a basic audio converter web app.
 
 ## Services
 
@@ -8,7 +8,7 @@ This web app will use three services:
 
 * Backend.
 * Frontend.
-* Video converter.
+* audio converter 
 
 ## BACKEND
 
@@ -36,9 +36,14 @@ Build locally with docker-compose.yaml and using mkcert for HTTPs.
 
 Deploy to digital Ocean with:
 
-* DigitalOcean Spaces
-* DigitalOcean Kubernetes
-* Terraform
-* Ansible
+* DigitalOcean Spaces [DONE]
+* DigitalOcean Kubernetes [TODO]
+* Terraform [WIP]
+* Ansible [TODO]
 
 [Redis with NESTJS](https://docs.nestjs.com/microservices/redis)
+
+## IDEA:
+* Backend upload file to bucket.
+* File conversor pull files from bucket, convert them, and upload them again in the bucket.
+* Backend stream files from bucket to frontend using websockets, redis, or something. (Or maybe backend just gives URL from S3 / Spaces bucket as response to frontend)
