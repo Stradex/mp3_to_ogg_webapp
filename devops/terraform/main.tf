@@ -1,7 +1,7 @@
 resource "digitalocean_spaces_bucket" "local_bucket" {
   name   = "local-bucket"
   region = "nyc3"
-
+  force_destroy = true
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET"]
